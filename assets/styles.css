@@ -1,0 +1,286 @@
+/* Reset default margin, padding, and box-sizing for all elements */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Base styles for the document */
+html,
+body {
+    height: 100%;
+    overflow: hidden; /* Prevent unnecessary scrollbars */
+    touch-action: none; /* Disable default browser gestures globally */
+    font-family: Arial, sans-serif;
+    background-color: black;
+}
+
+/* Start screen styling */
+.start-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 1000; /* Ensure it stays above everything else */
+    touch-action: auto; /* Allow interactions like clicking/tapping */
+}
+
+.start-button {
+    background-color: #f39c12;
+    display:block;
+    color: white;
+    padding: 20px 40px;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    touch-action: auto; /* Allow interactions like clicking/tapping */
+}
+
+.start-button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* General body styling for layout */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh; /* Use effective viewport height for better UX on iOS */
+}
+
+/* Header styling */
+.header {
+    flex: 0 0 10dvh; /* Use 10% of the effective dynamic viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.header h1 {
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+/* Content styling */
+.content {
+    flex: 1; /* Fill the remaining space */
+    display: grid;
+    grid-template-rows: repeat(10, 1fr);
+    user-select: none; /* Prevent text selection on touch */
+    touch-action: manipulation; /* Allow necessary interactions */
+}
+
+/* Light box styling */
+.light {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(
+        --light-bg-color,
+        transparent
+    ); /* CSS variable for dynamic color */
+    color: var(--light-border-color, white);;
+    border-color: var(--light-bg-color, transparent);
+    font-size: 1.2rem;
+    transition: background-color 1.5s cubic-bezier(0.1, 0.9, 0.2, 1),
+        border-color 1.5s cubic-bezier(0.1, 0.9, 0.2, 1);
+    user-select: none; /* Prevent text selection */
+    touch-action: manipulation; /* Allow interactions like clicking/tapping */
+}
+
+.light:before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+
+.light:after {
+    content: attr(data-id);
+    width: max(8dvh, 8dvw);
+    line-height: max(8dvh, 8dvw);
+    text-align: center;
+}
+
+.light:before,
+.light:after {
+    display: block;
+    border: 2px solid var(--light-border-color, white);
+    border-radius: 50%;
+}
+
+/* Footer styling */
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #333;
+}
+
+/* Gradient picker styling */
+#gradientPicker {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        red,
+        orange,
+        yellow,
+        green,
+        cyan,
+        blue,
+        violet
+    );
+    position: relative;
+}
+
+/* Color marker styling */
+#colorMarker {
+    position: absolute;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: black;
+    pointer-events: none; /* Ensure it doesn't interfere with clicking */
+    transform: translate(-50%, -50%); /* Center the marker */
+    display: none; /* Hidden initially */
+    user-select: none; /* Prevent text selection */
+    touch-action: manipulation; /* Allow necessary interactions */
+}
+
+/* Landscape mode: Switch to horizontal grid */
+@media (orientation: landscape) {
+    body {
+        flex-direction: column;
+    }
+    .content {
+        grid-template-rows: none;
+        grid-template-columns: repeat(10, 1fr);
+    }
+    .light:before {
+        padding: 39vh;
+    }
+    .light {
+        border-right-width: 1px;
+    }
+    .footer {
+        flex: 0 0 10dvh; /* Footer height in landscape mode */
+    }
+}
+
+/* Portrait mode: Switch to vertical layout with footer on the right */
+@media (orientation: portrait) {
+    body {
+        flex-direction: row; /* Arrange the content and footer in a row */
+    }
+    .content {
+        flex: 3;
+        grid-template-rows: repeat(10, 1fr);
+        grid-template-columns: none;
+    }
+    .footer {
+        flex: 0.5; /* Footer takes less space compared to content */
+        width: 10vw; /* Restrict width of the footer to fit neatly beside content */
+        height: 100%; /* Stretch the footer to fit the height */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #gradientPicker {
+        background: linear-gradient(
+            to top,
+            red,
+            orange,
+            yellow,
+            green,
+            cyan,
+            blue,
+            violet
+        ); /* Change gradient to vertical */
+    }
+    .light:before {
+        padding: 43vw;
+    }
+    .light:not(:first-of-type) {
+        border-bottom-width: 1px;
+    }
+    .light[data-id="1"] {
+        order: 10;
+    }
+    .light[data-id="2"] {
+        order: 9;
+    }
+    .light[data-id="3"] {
+        order: 8;
+    }
+    .light[data-id="4"] {
+        order: 7;
+    }
+    .light[data-id="5"] {
+        order: 6;
+    }
+    .light[data-id="6"] {
+        order: 5;
+    }
+    .light[data-id="7"] {
+        order: 4;
+    }
+    .light[data-id="8"] {
+        order: 3;
+    }
+    .light[data-id="9"] {
+        order: 2;
+    }
+    .light[data-id="10"] {
+        order: 1;
+    }
+}
+
+/* rainbow */
+
+
+.rainbow-svg {
+    width: 20%;
+    height: auto;
+}
+
+.rainbow-path {
+    stroke: url(#rainbowGradient);
+    stroke-width: 16;
+    stroke-linecap: round;
+    fill: none;
+    animation: rainbowAnimation 5s linear infinite;
+}
+
+@keyframes rainbowAnimation {
+    0% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: 2000;
+    }
+}
+
+#randomColorToggleLabel {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    width: 2rem;
+    height: 2rem;
+}
+
+#randomColorToggle  {
+    display:block;
+    width:100%;
+    height:100%;
+}
