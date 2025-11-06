@@ -53,8 +53,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
-    ws.onerror = ws.onclose = () => {
-      //learTimeout(errorTimeout);
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+      clearTimeout(errorTimeout);
+      // Try to reconnect after a delay
+      setTimeout(() => {
+        if (ws.readyState === WebSocket.CLOSED) {
+          connectWebSocket();
+        }
+      }, 5000);
+    };
+
+    ws.onclose = (event) => {
+      console.log("WebSocket closed", event.code, event.reason);
+      clearTimeout(errorTimeout);
+      // Try to reconnect after a delay
+      setTimeout(() => {
+        connectWebSocket();
+      }, 5000);
     };
   }
 
