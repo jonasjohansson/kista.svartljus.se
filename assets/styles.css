@@ -74,7 +74,7 @@ body {
 .content {
     flex: 1; /* Fill the remaining space */
     display: grid;
-    grid-template-rows: repeat(10, 1fr);
+    grid-template-rows: repeat(11, 1fr);
     user-select: none; /* Prevent text selection on touch */
     touch-action: manipulation; /* Allow necessary interactions */
 }
@@ -165,7 +165,7 @@ body {
     }
     .content {
         grid-template-rows: none;
-        grid-template-columns: repeat(10, 1fr);
+        grid-template-columns: repeat(11, 1fr);
     }
     .light:before {
         padding: 39vh;
@@ -185,7 +185,7 @@ body {
     }
     .content {
         flex: 3;
-        grid-template-rows: repeat(10, 1fr);
+        grid-template-rows: repeat(11, 1fr);
         grid-template-columns: none;
     }
     .footer {
@@ -243,6 +243,9 @@ body {
     }
     .light[data-id="10"] {
         order: 1;
+    }
+    .light[data-id="11"] {
+        order: 0;
     }
 }
 

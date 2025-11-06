@@ -9,6 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const randomColorToggle = document.getElementById("randomColorToggle");
   const isWithinDistance = false;
 
+  // Constants
+  const NUM_LIGHTS = 11;
+  const BRIGHTNESS_STEP = 10; // Percentage brightness change per step
+  const CENTER_LIGHT_INDEX = 5; // 0-based index of center light (light 6)
+
   // State Variables
   let activeColor = [255, 0, 0];
   let currentNoteMapping = [];
@@ -197,17 +202,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const lightId = parseInt(light.dataset.id) - 1;
 
     let adjustedColor;
-    if (lightId < 4) {
-      adjustedColor = adjustColorBrightness(activeColor, 10 * (4 - lightId));
-    } else if (lightId === 4 || lightId === 5) {
+    if (lightId < CENTER_LIGHT_INDEX) {
+      adjustedColor = adjustColorBrightness(activeColor, BRIGHTNESS_STEP * (CENTER_LIGHT_INDEX - lightId));
+    } else if (lightId === CENTER_LIGHT_INDEX) {
       adjustedColor = activeColor;
     } else {
-      adjustedColor = adjustColorBrightness(activeColor, -10 * (lightId - 5));
+      adjustedColor = adjustColorBrightness(activeColor, -BRIGHTNESS_STEP * (lightId - CENTER_LIGHT_INDEX));
     }
 
     setLightBackgroundColor(light, adjustedColor);
 
-    if (audioStarted && currentNoteMapping.length === 10) {
+    if (audioStarted && currentNoteMapping.length === NUM_LIGHTS) {
       const note = currentNoteMapping[lightId];
       if (note && synth) {
         try {
@@ -298,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
       baseNoteIndex = scaleNotes.indexOf("C4"); // Default to 'C' if the base note is invalid
     }
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < NUM_LIGHTS; i++) {
       const noteIndex = (baseNoteIndex + i) % scaleNotes.length;
       const noteOctave =
         octave + Math.floor((baseNoteIndex + i) / scaleNotes.length);
@@ -388,6 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
       8: 8,
       9: 9,
       0: 10,
+      "-": 11,
     };
 
     const lightId = keyToLightMap[event.key];
