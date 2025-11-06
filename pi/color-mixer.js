@@ -73,6 +73,13 @@ const RINGS = [
     errorCount: 0,
     lastError: 0,
   },
+  {
+    index: 11,
+    delay: 1 + DELAYOFFSET * 10,
+    ip: "192.168.1.211",
+    errorCount: 0,
+    lastError: 0,
+  },
 ];
 
 const OFF_PRESET_SPEC =
@@ -98,6 +105,12 @@ let startTime = 0;
 let connectionErrors = 0;
 
 let ringColorState = [
+  {
+    targetColor: [100, 50, 0],
+    liveColor: [100, 50, 0],
+    lastActivity: 0,
+    any: false,
+  },
   {
     targetColor: [100, 50, 0],
     liveColor: [100, 50, 0],
@@ -184,9 +197,7 @@ function _sendStateToRing(index, stateUpdate) {
     .catch((e) => {
       ring.errorCount++;
       ring.lastError = new Date().getTime();
-      console.log(
-        "! api call failed for " + ring.ip + " (" + ring.errorCount + " errors)"
-      );
+      console.log("! api call failed for " + ring.ip + " (" + ring.errorCount + " errors)");
     });
 }
 
@@ -254,20 +265,30 @@ function handleRelayMessage(msg) {
 
   if (msg.type === "enter") {
     if (msg.id && msg.color) {
-      buttonEvents.push({
-        ring: ~~msg.id - 1,
-        color: msg.color,
-        expires: new Date().getTime() + 10000,
-      });
+      const ringIndex = ~~msg.id - 1;
+      if (ringIndex >= 0 && ringIndex < RINGS.length) {
+        buttonEvents.push({
+          ring: ringIndex,
+          color: msg.color,
+          expires: new Date().getTime() + 10000,
+        });
+      } else {
+        console.warn("Invalid ring id:", msg.id, "expected 1-" + RINGS.length);
+      }
     }
   }
 
   if (msg.type === "ping") {
     if (msg.id) {
-      buttonEvents.push({
-        ring: ~~msg.id - 1,
-        expires: new Date().getTime() + 10000,
-      });
+      const ringIndex = ~~msg.id - 1;
+      if (ringIndex >= 0 && ringIndex < RINGS.length) {
+        buttonEvents.push({
+          ring: ringIndex,
+          expires: new Date().getTime() + 10000,
+        });
+      } else {
+        console.warn("Invalid ring id:", msg.id, "expected 1-" + RINGS.length);
+      }
     }
   }
 }
@@ -329,10 +350,14 @@ function updateTargetRingColorsFromState() {
   while ((evt = buttonEvents.shift())) {
     console.log("consumed queued button event", evt);
     if (evt.color && evt.ring !== undefined) {
-      ringColorState[evt.ring].targetColor = evt.color;
-      ringColorState[evt.ring].expires = T + COLOR_SUSTAIN_TIME;
-      lightTargetState = "live"; // should go to live mode
-      exitLiveDeadline = new Date().getTime() + LIVE_TIMEOUT_TIME;
+      if (evt.ring >= 0 && evt.ring < ringColorState.length) {
+        ringColorState[evt.ring].targetColor = evt.color;
+        ringColorState[evt.ring].expires = T + COLOR_SUSTAIN_TIME;
+        lightTargetState = "live"; // should go to live mode
+        exitLiveDeadline = new Date().getTime() + LIVE_TIMEOUT_TIME;
+      } else {
+        console.warn("Invalid ring index in event:", evt.ring);
+      }
     }
   }
 
@@ -516,6 +541,11 @@ async function init() {
 
   console.log("Dendrolux ring server");
   console.log("");
+
+  // Validate that ringColorState matches RINGS.length
+  if (ringColorState.length !== RINGS.length) {
+    console.error(`Mismatch: ringColorState has ${ringColorState.length} entries but RINGS has ${RINGS.length} entries`);
+  }
 
   startErrorReporter();
 
